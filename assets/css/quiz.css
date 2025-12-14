@@ -1,0 +1,250 @@
+/* assets/css/quiz.css */
+
+body.game-body {
+    background: url('../bg.avif') no-repeat center center / cover;
+    background-attachment: fixed;
+    /* Maintain existing flex alignment if needed, but background is the key */
+}
+
+.game-layout {
+    display: flex;
+    justify-content: center; /* Center the main content */
+    gap: 20px;
+    align-items: center; /* Vertically center all columns */
+    height: 100vh; /* Full height */
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.sidebar-right {
+    width: 250px; /* Slightly wider for the new cards */
+    background: rgba(0,0,0,0.5);
+    border: 2px solid #444;
+    padding: 10px;
+    height: 80%;
+    display: flex; flex-direction: column; gap: 10px;
+    overflow-y: auto; 
+    /* Keep it on the right if using flex center */
+    margin-left: auto; 
+}
+.sidebar-left h3, .sidebar-right h3 {
+    text-align: center; color: #aaa; margin: 0 0 10px 0;
+    font-size: 1.2rem;
+}
+
+.card-slots {
+    display: flex; flex-direction: column; gap: 10px;
+}
+
+.joker-card, .consumable-card {
+    width: 100%; height: 260px; /* Increased height for portrait cards */
+    background: none; /* No background color */
+    border: none; /* No border */
+    display: flex; justify-content: center; align-items: flex-end; /* Text at bottom */
+    color: transparent; /* Hide text by default, show on hover? OR just remove text overlay */
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: transform 0.1s;
+    text-shadow: 0 2px 2px black;
+}
+.consumable-card { /* No specific border color needed */ }
+.consumable-card:hover { transform: scale(1.05); }
+.consumable-card:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+/* MAIN STAGE */
+.main-stage {
+    flex-grow: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 0 20px;
+}
+
+/* TIMER */
+/* VERTICAL TIMER */
+.timer-container-vertical {
+    width: 30px; 
+    height: 600px; /* Match game height roughly or use % */
+    background: #111;
+    border: 2px solid #555;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    margin-right: 20px;
+    border-radius: 15px;
+    overflow: hidden;
+}
+.timer-bar-vertical {
+    width: 100%;
+    height: 100%; /* Starts full */
+    background: linear-gradient(to top, var(--red), #ff6b6b);
+    transition: height 0.1s linear;
+    position: absolute; 
+    bottom: 0; /* Shrink from top downwards? Or bottom upwards? Usually timer shrinks. 
+                  If height reduces, and bottom:0, it shrinks downwards. 
+                  Wait, if height 100% -> 0%, and aligned bottom:0, top part disappears. 
+                  User wants "Time moves vertically". */
+}
+
+/* Replaced by the bottom block, ensuring no double definitions. 
+   Emptying this block to defer to the simplified, aggregated styles I just added at the bottom 
+   OR better yet, overwriting this block with the new styles directly. 
+*/
+/* QUESTION CARD REFINED */
+.question-card h2 {
+    font-size: 2.2rem; margin: 10px 0;
+    text-transform: none; 
+    font-family: 'Courier New', monospace; /* or existing pixel font */
+}
+
+/* OPTIONS HAND REFINED - Styles moved to bottom block, removing here to avoid conflict if I didn't replace them */
+.options-grid {
+    /* See layout below */
+}
+.option-card {
+    background: white; border: 4px solid #333;
+    padding: 20px;
+    font-size: 1.5rem; color: #333;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.1s, background 0.2s;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.3);
+    position: relative;
+}
+.option-card:hover {
+    transform: translateY(-5px);
+    background: #fff;
+    border-color: var(--gold);
+}
+.option-card:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+}
+
+.option-correct {
+    background: var(--blue) !important; color: white !important; border-color: white !important;
+}
+.option-wrong {
+    background: #555 !important; color: #999 !important; border-color: #333 !important;
+}
+.option-disabled {
+    opacity: 0.3; pointer-events: none;
+}
+
+/* STATUS SIDEBAR (Left Column) */
+.status-sidebar {
+    display: flex;
+    flex-direction: row; /* HUD next to Timer? Or Column? User said score vertical. 
+                           Let's align HUD items vertically in a box, and place that box 
+                           next to the timer or above it. 
+                           Let's go with: [HUD Box] [Timer Bar] side-by-side or stacked. 
+                           "Score also vertical" implies the LIST of numbers is vertical. */
+    flex-direction: row; 
+    gap: 20px;
+    height: 80%;
+    align-items: center;
+}
+
+/* HUD VERTICAL BOX */
+.hud-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 20px;
+    background: rgba(0,0,0,0.8);
+    border: 2px solid #555;
+    border-radius: 10px;
+    min-width: 120px;
+    text-align: center;
+    justify-content: center;
+    height: 100%; /* Fill height */
+}
+
+.hud-item {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.hud-item .label { font-size: 0.9rem; color: #aaa; letter-spacing: 1px; }
+.hud-item .value { font-size: 1.8rem; font-weight: bold; }
+
+/* Adjust Vertical Timer to fit */
+.timer-container-vertical {
+    margin-right: 0; /* Removing margin as we have gap in container */
+}
+
+/* MAIN CONTENT */
+.main-stage {
+    flex-grow: 1;
+    display: flex; flex-direction: column;
+    align-items: center; 
+    justify-content: center; /* Center vertically */
+    padding: 20px;
+    width: 100%;
+}
+
+/* QUESTION CARD */
+.question-card {
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 30px;
+    width: 90%; max-width: 900px;
+    text-align: center;
+    border: 4px solid #fff;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    margin-bottom: 30px;
+    position: relative;
+    image-rendering: pixelated;
+    border-radius: 10px;
+}
+.blind-badge {
+    position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+    background: var(--blue); color: white; padding: 5px 20px;
+    border: 2px solid white; font-weight: bold; font-size: 0.9rem;
+    border-radius: 20px;
+}
+
+/* OPTIONS GRID */
+.options-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    width: 90%; max-width: 900px;
+    height: 400px; /* Force height for big buttons */
+}
+.option-card {
+    background: #222; 
+    border: 4px solid #444;
+    padding: 20px;
+    font-size: 1.8rem; color: white;
+    cursor: pointer;
+    text-align: center;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.1s, background 0.2s;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.5);
+    border-radius: 10px;
+}
+/* Colorful quizizz style borders/hover */
+.option-card:nth-child(1) { border-color: #e21b3c; } /* Red */
+.option-card:nth-child(2) { border-color: #1368ce; } /* Blue */
+.option-card:nth-child(3) { border-color: #d89e00; } /* Yellow */
+.option-card:nth-child(4) { border-color: #26890c; } /* Green */
+
+.option-card:hover {
+    transform: translateY(-5px);
+    background: #333;
+}
+.option-card:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+}
+
+/* ANIMATIONS */
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+.shake { animation: shake 0.5s; }

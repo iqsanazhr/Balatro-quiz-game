@@ -1,0 +1,771 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+:root {
+    --bg-color: #2C3E50;
+    --red: #FE5F55;
+    --blue: #009DDC;
+    --gold: #F1C40F;
+    --crt-scanline: rgba(18, 16, 16, 0.3);
+    --font-main: 'VT323', monospace;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: white;
+    font-family: var(--font-main);
+    overflow: hidden; 
+    height: 100vh;
+    width: 100vw;
+    font-size: 24px;
+    -webkit-font-smoothing: none;
+}
+
+/* --- CUSTOM SCROLLBAR (Global) --- */
+::-webkit-scrollbar {
+    width: 12px;
+}
+::-webkit-scrollbar-track {
+    background: #000; /* Dark track */
+    border: 1px solid #333;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--blue); /* Blue thumb */
+    border-radius: 6px;
+    border: 2px solid #000; /* Create padding effect */
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #007bb5;
+}
+
+/* Ensure generic elements also pick this up if needed, though ::-webkit-scrollbar targets all */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--blue) #000;
+}
+
+/* --- CRT SCANLINE OVERLAY --- */
+.crt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.25) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 9999;
+    animation: scanlineScroll 10s linear infinite;
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+}
+
+@keyframes scanlineScroll {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100%; }
+}
+
+/* Scroll Right Animation for Banner */
+@keyframes scrollRight {
+    0% { background-position: 0 0; }
+    100% { background-position: 1920px 0; } /* Arbitrary large width for ensuring movement, assumes repeat */
+}
+
+/* Entry Animation */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.scrolling-banner {
+    width: 100%;
+    height: 150px; /* Distinct height */
+    background: url('../bander.webp') repeat-x center center;
+    background-size: auto 100%; /* Fit vertically, repeat horizontally */
+    animation: scrollRight 30s linear infinite, fadeInUp 0.8s ease-out 1.2s both; /* Added entry animation */
+    margin-top: 50px;
+    border-top: 4px solid #333;
+    box-shadow: 0 -10px 20px rgba(0,0,0,0.5);
+    position: relative; z-index: 10;
+}
+
+/* --- FOOTER SECTION --- */
+.footer-section {
+    position: relative;
+    width: 100%;
+    background: #111;
+    display: flex; justify-content: space-between; align-items: flex-end; /* Align images to bottom */
+    padding: 0;
+    margin-top: -10px; /* Slight overlap or connect to banner */
+    overflow: hidden;
+    animation: fadeInUp 0.8s ease-out 1.0s both; /* Entry 5 */
+}
+
+.footer-img-left, .footer-img-right {
+    height: 150px; /* Adjust height based on asset aspect ratio */
+    width: auto;
+    z-index: 20;
+}
+.footer-img-left { margin-right: auto; }
+.footer-img-right { margin-left: auto; }
+
+.footer-text {
+    text-align: center;
+    padding-bottom: 20px;
+    font-family: 'VT323', monospace;
+    z-index: 30;
+    position: absolute; 
+    left: 50%; bottom: 10px;
+    transform: translateX(-50%); /* Mathematical center */
+    width: 100%; /* Ensure text align center works within this if content wraps */
+    pointer-events: none; /* Let clicks pass through if needed, but links need pointer-events auto */
+}
+.footer-links { pointer-events: auto; } /* Re-enable for links */
+
+.footer-links a {
+    color: #fff; text-decoration: none; margin: 0 15px;
+    font-size: 1.2rem; text-transform: uppercase;
+    font-weight: bold;
+    text-shadow: 2px 2px 0 #000;
+}
+.footer-links a:hover { color: var(--red); }
+
+.copyright {
+    color: #777; font-size: 0.9rem; margin-top: 5px;
+}
+
+/* --- TEXT & UI ELEMENTS --- */
+h1, h2, h3, button, input {
+    font-family: var(--font-main);
+    text-transform: uppercase;
+}
+
+.blink-text {
+    animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+    to { opacity: 0; }
+}
+
+/* --- GAME CARD AESTHETIC --- */
+.card-panel {
+    background: rgba(0, 0, 0, 0.8);
+    border: 4px solid var(--blue);
+    box-shadow: 0 0 15px var(--blue);
+    padding: 2rem;
+    text-align: center;
+    image-rendering: pixelated;
+    transition: transform 0.1s;
+}
+
+/* --- JIGGLE EFFECT ON HOVER --- */
+.jiggle:hover {
+    animation: jiggle 0.4s infinite;
+    cursor: pointer;
+}
+
+@keyframes jiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(1deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(-1deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* --- GLITCH ANIMATION CLASS --- */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.float-anim {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Apply directly to cards, or use the class in HTML. Let's apply to base classes */
+.menu-card, .shop-card, .play-card, .home-logo, .joker-showcase {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Stagger animations for visual interest using nth-child if possible, or random offsets */
+.menu-card:nth-child(odd), .shop-card:nth-child(odd) {
+    animation-delay: 0.5s;
+}
+
+.glitch-active {
+    animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+    color: var(--red);
+    background: black;
+}
+
+.glitch-active::before, .glitch-active::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+}
+
+/* Page Transition Overlay */
+#page-transition {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: black;
+    z-index: 20000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease-in-out;
+}
+.fade-out-active {
+    opacity: 1 !important;
+}
+
+/* Page Transition Overlay */
+
+/* Page Transition Overlay */
+#page-transition {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: black;
+    z-index: 20000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease-in-out;
+}
+.fade-out-active {
+    opacity: 1 !important;
+}
+
+@keyframes glitch-skew {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+.login-bg-active {
+    background: url('../balatro_login_bg.gif') no-repeat center center;
+    background-size: cover;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* --- LOGIN/INTRO STYLES (3D SWITCH) --- */
+#intro-container {
+    position: relative;
+    width: 100%; height: 100%;
+    display: flex; justify-content: center; align-items: center;
+}
+#bg-video {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover; z-index: -1;
+    filter: contrast(1.2) brightness(0.8);
+}
+.login-container {
+    /* Main container for the 3D positioning */
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 450px; height: 500px;
+    display: flex; justify-content: center; align-items: center;
+    perspective: 1000px; /* Essential for 3D effect */
+}
+
+/* Common Card Style */
+.login-box-3d {
+    position: absolute; 
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(34, 34, 34, 0.95);
+    border: 6px solid var(--red);
+    box-shadow: 10px 10px 0px rgba(0,0,0,0.5);
+    padding: 30px; 
+    text-align: center;
+    box-sizing: border-box;
+    display: flex; flex-direction: column; justify-content: center;
+}
+
+/* Specific Card: Sign In form is initially front */
+.signIn {
+    z-index: 2;
+    transform: perspective(100px) translate3d(0, 0, 0);
+    opacity: 1;
+    border-color: var(--blue); /* Blue for Login */
+}
+
+/* Specific Card: Sign Up form is initially back/hidden */
+.signUp {
+    z-index: 1;
+    transform: perspective(100px) translate3d(100px, 0px, -30px);
+    opacity: 0.5;
+    border-color: var(--red); /* Red for Register */
+}
+
+.login-box-3d h2 {
+    font-size: 3rem; margin-bottom: 20px;
+    text-shadow: 4px 4px 0 #000;
+}
+.login-box-3d p {
+    color: #aaa; margin-bottom: 20px; font-size: 1.2rem;
+}
+
+.login-box-3d input {
+    display: block; width: 100%; margin: 10px 0;
+    background: #000; border: 2px solid #555;
+    color: var(--gold); font-size: 1.5rem; padding: 10px;
+    box-sizing: border-box;
+}
+.login-box-3d input:focus { border-color: var(--gold); outline: none; }
+
+.form-btn {
+    width: 100%; background: var(--grey);
+    border: none; color: white; font-size: 2rem; padding: 10px;
+    margin-top: 20px; cursor: pointer;
+    font-family: var(--font-main);
+    transition: all 0.2s;
+}
+
+/* Play/Submit Button */
+.btn-submit {
+    background: var(--red); 
+    box-shadow: 0 4px 0 #900;
+    margin-top: 10px;
+}
+.btn-submit:active { transform: translateY(4px); box-shadow: none; }
+
+/* Switch Button (Ghost) */
+.btn-switch {
+    background: transparent; border: 2px solid var(--gold);
+    color: var(--gold); margin-top: 10px;
+}
+.btn-switch:hover { background: var(--gold); color: #000; }
+
+/* --- 3D ANIMATION CLASSES --- */
+.active-dx {
+    animation: foregrounding-dx 0.9s forwards;
+}
+.active-sx {
+    animation: foregrounding-sx 0.9s forwards;
+}
+.inactive-dx {
+    animation: overshadowing-dx 0.9s forwards;
+}
+.inactive-sx {
+    animation: overshadowing-sx 0.9s forwards;
+}
+
+/* MOVE TAB TO FRONT (RIGHT SIDE START) */
+@keyframes foregrounding-dx {
+    0% { z-index:1; transform: perspective(100px) translate3d(100px, 0px, -30px); opacity: 0.5; }
+    50% { z-index:2; transform: perspective(100px) translate3d(400px, 0px, -30px); }
+    100% { z-index:2; transform: perspective(100px) translate3d(0px, 0px, 0px); opacity: 1; }
+}
+/* MOVE TAB TO FRONT (LEFT SIDE START) */
+@keyframes foregrounding-sx {
+    0% { z-index:1; transform: perspective(100px) translate3d(-100px, 0px, -30px); opacity: 0.5; }
+    50% { z-index:2; transform: perspective(100px) translate3d(-400px, 0px, -30px); }
+    100% { z-index:2; transform: perspective(100px) translate3d(0px, 0px, 0px); opacity: 1; }
+}
+
+/* MOVE TAB TO BACK (RIGHT) */
+@keyframes overshadowing-dx {
+    0% { z-index:2; transform: perspective(100px) translate3d(0px, 0px, 0px); opacity: 1; }
+    100% { z-index: 1; transform: perspective(100px) translate3d(100px, 0px, -30px); opacity: 0.5; }
+}
+/* MOVE TAB TO BACK (LEFT) */
+@keyframes overshadowing-sx {
+    0% { z-index:2; transform: perspective(100px) translate3d(0px, 0px, 0px); opacity: 1; }
+    100% { z-index: 1; transform: perspective(100px) translate3d(-100px, 0px, -30px); opacity: 0.5; }
+}
+
+#screen-burn {
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%; background: white;
+    z-index: 10000; mix-blend-mode: difference;
+}
+
+/* --- DASHBOARD STYLES --- */
+.dashboard-body {
+    display: flex; flex-direction: column; min-height: 100vh; height: auto;
+    background: url('../bg.avif') no-repeat center center / cover;
+    background-attachment: fixed; /* Keep BG fixed while scrolling */
+    overflow-y: auto;
+}
+/* Old definitions being removed/merged - See top of file for animations */
+
+.home-logo {
+    display: block;
+    margin: 100px auto 50px auto;
+    width: 650px; height: auto;
+    filter: drop-shadow(4px 4px 0px black);
+    transition: transform 0.2s;
+    animation: fadeInUp 0.8s ease-out 0.2s both; /* Entry 1 */
+}
+.home-logo:hover { transform: scale(1.1); }
+
+.menu-header {
+    text-align: center; font-size: 2.5rem; margin: 50px 0 10px 0;
+    color: #fff; text-shadow: 3px 3px 0 #000; letter-spacing: 5px;
+    font-family: 'VT323', monospace; opacity: 0.9;
+    animation: fadeInUp 0.8s ease-out 0.4s both; /* Entry 2 */
+}
+
+.hud-top {
+    display: flex; justify-content: space-between; padding: 20px 40px;
+    background: rgba(0,0,0,0.5); /* Semi-transparent header bg */
+    border-bottom: 2px solid #555;
+}
+.hud-item { font-size: 1.5rem; color: white; }
+.text-gold { color: var(--gold); }
+.btn-logout {
+    text-decoration: none; color: var(--red); border: 1px solid var(--red); padding: 0 10px;
+}
+.btn-logout:hover { background: var(--red); color: white; }
+.card-menu-container {
+    /* Large padding to prevent hover clipping of the oversized Joker */
+    display: flex; align-items: center; justify-content: center;
+    gap: 30px; padding: 40px 40px 100px 40px; /* Reduced top padding from 100px to 40px */
+    overflow-x: auto; overflow-y: visible;
+    /* perspective: 1000px; - REMOVED */
+    width: 100%; max-width: 1400px; margin: 0 auto; /* Ensure it doesn't stretch infinitely left aligned */
+    transform: translateX(-19px); /* Manual nudge to left as requested (-14px) */
+    animation: fadeInUp 0.8s ease-out 0.6s both; /* Entry 3 */
+    position: relative; z-index: 100; /* Ensure above banner/footer */
+}
+.card-menu-container::-webkit-scrollbar { display: none; /* Hide scrollbar but keep functionality */ }
+.menu-card {
+    width: 200px; height: 300px;
+    border-radius: 0; /* Remove smooth radius */
+    /* Pixel Art "Chamfered" Corners via Clip-Path */
+    clip-path: polygon(
+        6px 0, calc(100% - 6px) 0, 
+        100% 6px, 100% calc(100% - 6px), 
+        calc(100% - 6px) 100%, 6px 100%, 
+        0 calc(100% - 6px), 0 6px
+    );
+    position: relative;
+    cursor: pointer; transition: transform 0.2s ease-out; flex-shrink: 0;
+    background: #f0f0f0;
+    border: 6px solid #333; /* Note: clip-path might clip outline, but it looks like an inner stroke */
+    /* box-shadow doesn't work well with clip-path (it gets clipped). We can use drop-shadow on parent or filter */
+    box-shadow: none; /* Removed standard box-shadow */
+    filter: drop-shadow(6px 6px 0px rgba(0,0,0,0.4)); /* Drop shadow that respects clip-path */
+    color: #333;
+    image-rendering: pixelated;
+    font-family: 'VT323', monospace;
+}
+.card-inner {
+    width: 100%; height: 100%; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; pointer-events: none;
+    padding: 10px; box-sizing: border-box; position: relative;
+    border: 2px solid transparent; /* Placeholder for inner border if needed */
+}
+.card-corner-top {
+    position: absolute; top: 8px; left: 8px;
+    font-size: 2.5rem; line-height: 1; font-weight: normal;
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+}
+.card-corner-bottom {
+    position: absolute; bottom: 8px; right: 8px;
+    font-size: 2.5rem; line-height: 1; font-weight: normal;
+    transform: rotate(180deg);
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+}
+.card-title {
+    font-size: 2rem; font-weight: normal; margin-bottom: 5px;
+    text-transform: uppercase; letter-spacing: 2px;
+}
+.card-icon { font-size: 5rem; margin: 5px 0; border: none; } /* Legacy support or remove */
+.card-icon-img {
+    width: 100px; height: 100px; /* Fixed size for consistency */
+    object-fit: contain;
+    margin: 10px 0;
+    image-rendering: pixelated;
+    filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.3));
+}
+.card-desc { font-size: 1.2rem; opacity: 1; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Suit Colors & Specifics */
+.card-2-hearts, .card-ace-hearts, .card-ace-diamonds { color: #fe5f55; border-color: #333; }
+.card-ace-spades, .card-ace-clubs { color: #333; border-color: #333; }
+
+/* Joker Override using Image Asset */
+/* Full Art Card Style (New Standard) */
+.art-card {
+    width: 200px; height: 300px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent;
+    border: none !important;
+    box-shadow: none !important;
+    clip-path: none !important; /* Remove the pixel corner clip */
+    display: flex; flex-direction: column; justify-content: flex-end;
+    transition: transform 0.3s ease-in-out;
+    filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.5));
+}
+.art-card:hover {
+    transform: translateY(-20px) scale(1.1) !important;
+    z-index: 50;
+    filter: drop-shadow(10px 10px 5px rgba(0,0,0,0.6));
+}
+.art-card .card-inner {
+    border: none;
+    padding-bottom: 20px;
+    justify-content: flex-end;
+}
+.art-label {
+    color: white;
+    text-shadow: 3px 3px 0 #000, -1px -1px 0 #000;
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+/* Main Play Card - Slightly Larger */
+.main-play {
+    width: 240px; height: 360px;
+}
+
+/* --- JOKER SHOWCASE SECTION --- */
+/* --- JOKER SHOWCASE SECTION --- */
+/* --- JOKER SHOWCASE SECTION --- */
+.game-info-section {
+    padding: 60px 0 100px 0;
+    display: flex; justify-content: center;
+    color: white;
+    animation: fadeInUp 0.8s ease-out 0.8s both; /* Entry 4 */
+}
+.info-content {
+    display: flex; align-items: center; justify-content: center; gap: 40px;
+    width: 100%; max-width: 1000px;
+    /* Removed box/background styles to match reference */
+}
+.joker-showcase {
+    flex: 1; /* Take up 50% space context */
+    max-width: 300px; height: auto;
+    object-fit: contain;
+    filter: drop-shadow(10px 10px 5px rgba(0,0,0,0.5));
+    transform: rotate(-10deg); /* Static tilt like image */
+    transition: transform 0.3s;
+    margin-right: auto; /* Push towards center from left */
+    display: block;
+}
+.joker-showcase:hover {
+    transform: rotate(0deg) scale(1.1);
+}
+.info-text {
+    flex: 1; /* Take up 50% space context */
+    font-family: 'VT323', monospace; text-align: left;
+    display: flex; flex-direction: column; justify-content: center;
+}
+.info-text h3 {
+    font-size: 2rem; margin: 0 0 15px 0;
+    color: #fff; text-transform: none; /* Reference has mixed case or standard caps */
+    text-shadow: 2px 2px 0 #000;
+}
+.info-text p {
+    font-size: 1.6rem; line-height: 1.6; margin: 0;
+    color: #ddd; text-shadow: 2px 2px 0 #000;
+}
+/* --- GAME BOARD STYLES --- */
+.game-body {
+    background: #0b3d28; display: flex; justify-content: center; align-items: center;
+}
+.result-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: rgba(0,0,0,0.9); text-align: center;
+}
+.win-overlay { box-shadow: inset 0 0 100px var(--gold); }
+.lose-overlay { box-shadow: inset 0 0 100px var(--red); }
+.game-container {
+    width: 100%; max-width: 1000px; height: 100%; display: flex; flex-direction: column;
+    justify-content: space-between; padding: 20px;
+}
+.boss-blind-panel {
+    background: #222; border: 4px solid var(--red); padding: 20px; text-align: center;
+    box-shadow: 0 10px 0 rgba(0,0,0,0.5); margin-bottom: 20px;
+}
+.boss-blind-panel h3 { color: var(--red); margin: 0; font-size: 2rem; }
+.question-text { font-size: 1.5rem; margin-top: 10px; color: #fff; text-transform: none; }
+.hand-area { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+.play-card {
+    width: 150px; height: 220px; background: white; color: black; border-radius: 10px;
+    position: relative; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: transform 0.2s, box-shadow 0.2s; user-select: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 10px;
+}
+.play-card:hover { transform: translateY(-20px); }
+.play-card.selected {
+    transform: translateY(-40px); box-shadow: 0 0 20px var(--gold); border: 4px solid var(--gold);
+}
+.card-suit { position: absolute; top: 5px; left: 10px; font-size: 1.5rem; font-weight: bold; color: var(--blue); }
+.card-corner {
+    position: absolute; bottom: 5px; right: 10px; font-size: 1.5rem; font-weight: bold; color: var(--blue);
+    transform: rotate(180deg);
+}
+.card-center { font-size: 1.2rem; font-weight: bold; color: #333; line-height: 1.2; }
+.action-area { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+/* --- PROFILE STATS --- */
+.stats-table {
+    width: 100%;
+    margin-top: 20px;
+    border-top: 2px dashed #444;
+}
+.stats-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 10px;
+    border-bottom: 2px dashed #444;
+    font-size: 1.5rem;
+    transition: background 0.2s;
+}
+.stats-row:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+.stats-label { color: #ccc; }
+.stats-value { color: var(--gold); text-shadow: 2px 2px 0 #000; font-weight: bold; }
+.stats-value.join-date { color: #777; font-size: 1rem; }
+
+.btn-cancel {
+    background: transparent; border: 1px solid #aaa; color: #aaa;
+    padding: 10px 30px; cursor: pointer; font-family: var(--font-main); font-size: 1.2rem;
+}
+.btn-play:disabled { background: #555; color: #888; box-shadow: none; cursor: not-allowed; }
+.btn-play.ready {
+    animation: jiggle 0.5s infinite; background: var(--gold); color: black; box-shadow: 0 4px 0 #b7950b;
+}
+
+/* --- SHOP & COLLECTION STYLES (NEW) --- */
+.content-grid-container {
+    padding: 40px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    overflow-y: auto;
+    height: calc(100vh - 80px); /* Minus HUD */
+}
+
+
+/* Scrollbar for grid (Removed to use global style) */
+
+/* Scrollbar for grid (Removed to use global style) */
+
+.shop-card, .collection-card {
+    width: 160px;
+    height: 240px;
+    background: #fff;
+    border-radius: 8px;
+    border: 3px solid #000;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
+    transition: transform 0.1s;
+    color: #000;
+}
+
+.shop-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img-placeholder {
+    width: 100%;
+    height: 120px;
+    background: #ccc;
+    border-bottom: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+}
+
+.card-info {
+    padding: 10px;
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+    line-height: 1.1;
+}
+
+.card-type {
+    font-size: 0.8rem;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.card-price {
+    background: var(--gold);
+    color: black;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.btn-buy {
+    width: 100%;
+    background: var(--blue);
+    color: white;
+    border: none;
+    padding: 5px;
+    margin-top: 5px;
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-size: 1.2rem;
+}
+
+.btn-buy:hover {
+    background: #007bb5;
+}
+
+.btn-buy:disabled {
+    background: #555;
+    cursor: not-allowed;
+}
+
+.owned-badge {
+    position: absolute;
+    top: 5px; right: 5px;
+    background: var(--red);
+    color: white;
+    padding: 2px 5px;
+    font-size: 0.8rem;
+    transform: rotate(10deg);
+}
+
+.back-btn-float {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--red);
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 1.5rem;
+    box-shadow: 4px 4px 0 #000;
+    z-index: 500;
+}
+.back-btn-float:active { transform: translateY(4px); box-shadow: none; }
