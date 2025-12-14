@@ -1,10 +1,10 @@
 <?php
 session_start();
 include 'includes/db.php';
-$page_title = 'WIKI';
+$page_title = 'INFO';
 include 'includes/header.php';
 
-$page_label = 'WIKI';
+$page_label = 'INFO';
 include 'includes/navbar.php';
 ?>
 
@@ -29,23 +29,48 @@ include 'includes/navbar.php';
     <h1 style="color:var(--red); font-size:3rem; text-align:center; margin-bottom: 40px;">CARD ENCYCLOPEDIA</h1>
 
     <?php
-    // Fetch All Skill Cards for Wiki
+    // Fetch Skill Cards
     $stmt = $pdo->prepare("SELECT * FROM cards WHERE category = 'Skill' ORDER BY price ASC");
     $stmt->execute();
-    $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $skill_cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach ($cards as $card):
-        ?>
-        <!-- Reusing .game-info-section style for consistency but adjusting padding -->
+    // Fetch Collection Cards
+    $stmt = $pdo->prepare("SELECT * FROM cards WHERE category = 'Collection' ORDER BY price ASC");
+    $stmt->execute();
+    $collection_cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    ?>
+
+    <h2 style="color:var(--gold); border-bottom: 2px solid var(--gold); display:inline-block; margin-bottom: 30px;">SKILL CARDS</h2>
+    <?php foreach ($skill_cards as $card): ?>
         <div class="game-info-section" style="padding: 20px 0; border-bottom: 1px dashed #444;">
             <div class="info-content">
-
-                <!-- LEFT: CARD IMAGE (Tilted) -->
                 <img src="<?php echo htmlspecialchars($card['image_url']); ?>"
                     alt="<?php echo htmlspecialchars($card['name']); ?>" class="joker-showcase tilt-card"
                     style="max-width: 200px; transform: rotate(-5deg);">
+                <div class="info-text">
+                    <h3 style="color: var(--blue); text-shadow: 2px 2px 0 #000; font-size: 2.2rem;">
+                        <?php echo htmlspecialchars($card['name']); ?>
+                    </h3>
+                    <p style="color: #fff; font-size: 1.4rem;">
+                        "<?php echo htmlspecialchars($card['description']); ?>"
+                    </p>
+                    <div style="margin-top: 10px;">
+                        <span class="card-price">$<?php echo number_format($card['price']); ?></span>
+                        <span style="color: #aaa; margin-left: 10px;"><?php echo htmlspecialchars($card['type']); ?></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
 
-                <!-- RIGHT: DESCRIPTION -->
+    <br><br>
+    <h2 style="color:var(--red); border-bottom: 2px solid var(--red); display:inline-block; margin-bottom: 30px;">COLLECTION CARDS</h2>
+    <?php foreach ($collection_cards as $card): ?>
+        <div class="game-info-section" style="padding: 20px 0; border-bottom: 1px dashed #444;">
+            <div class="info-content">
+                <img src="<?php echo htmlspecialchars($card['image_url']); ?>"
+                    alt="<?php echo htmlspecialchars($card['name']); ?>" class="joker-showcase tilt-card"
+                    style="max-width: 200px; transform: rotate(-5deg);">
                 <div class="info-text">
                     <h3 style="color: var(--gold); text-shadow: 2px 2px 0 #000; font-size: 2.2rem;">
                         <?php echo htmlspecialchars($card['name']); ?>
@@ -58,7 +83,6 @@ include 'includes/navbar.php';
                         <span style="color: #aaa; margin-left: 10px;"><?php echo htmlspecialchars($card['type']); ?></span>
                     </div>
                 </div>
-
             </div>
         </div>
     <?php endforeach; ?>

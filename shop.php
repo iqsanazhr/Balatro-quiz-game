@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Start output buffering to prevent header issues
 session_start();
 include 'includes/db.php';
 
@@ -11,7 +12,7 @@ $user_id = $_SESSION['user_id'];
 $message = "";
 
 // Handle Buy Action
-if (isset($_POST['buy_card_id'])) {
+if (isset($_POST['buy_card_id']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $card_id = $_POST['buy_card_id'];
 
     // Fetch User Chips again to be safe
@@ -28,7 +29,9 @@ if (isset($_POST['buy_card_id'])) {
         if ($user_chips >= $card['price']) {
             // Transaction (Keep it simple, avoid long locks)
             try {
-                $pdo->beginTransaction();
+                if (!$pdo->inTransaction()) {
+                    $pdo->beginTransaction();
+                }
 
                 // Deduct Chips
                 $stmt = $pdo->prepare("UPDATE users SET chips_balance = chips_balance - ? WHERE id = ?");
@@ -48,7 +51,9 @@ if (isset($_POST['buy_card_id'])) {
                 if ($pdo->inTransaction()) {
                     $pdo->rollBack();
                 }
-                header("Location: shop.php?error=" . urlencode("TRANSACTION FAILED"));
+                // Log error
+                error_log("Transaction Failed: " . $e->getMessage());
+                header("Location: shop.php?error=" . urlencode("SYSTEM BUSY: PLEASE RETRY"));
                 exit;
             }
         } else {
@@ -81,7 +86,11 @@ $owned_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
 $page_title = 'SHOP';
 include 'includes/header.php';
+?>
+<!-- Include Quiz CSS for Notifications -->
+<link rel="stylesheet" href="assets/css/quiz.css?v=<?php echo time(); ?>">
 
+<?php
 $page_label = 'SHOP';
 $show_chips = true;
 include 'includes/navbar.php';
@@ -93,9 +102,9 @@ include 'includes/navbar.php';
         <?php echo $message; ?>
     </div>
     <script>
-        setTimeout(() => { 
+        setTimeout(() => {
             const note = document.getElementById('shop-notification');
-            if(note) {
+            if (note) {
                 note.classList.remove('show');
                 setTimeout(() => note.remove(), 300);
             }

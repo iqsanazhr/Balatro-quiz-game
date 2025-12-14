@@ -11,7 +11,7 @@ CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    chips_balance INT DEFAULT 1000, -- Increased starting balance for testing
+    chips_balance INT DEFAULT 1000, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -19,7 +19,7 @@ CREATE TABLE cards (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     type ENUM('Joker', 'Tarot') NOT NULL,
-    category ENUM('Skill', 'Collection') DEFAULT 'Collection', -- New Column
+    category ENUM('Skill', 'Collection') DEFAULT 'Collection', 
     effect_logic TEXT,
     price INT NOT NULL,
     description VARCHAR(255),

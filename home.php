@@ -60,11 +60,11 @@ if (!$user) {
             </div>
         </div>
 
-        <!-- 2. Wiki -> DNA -->
-        <div class="menu-card art-card" style="background-image: url('assets/card/DNA.webp');"
-            onclick="window.location.href='wiki.php'">
+        <!-- 2. Info -> DNA -->
+        <div class="menu-card art-card" style="background-image: url('assets/card/DNA.webp'); animation-delay: 0.2s;"
+            onclick="window.location.href='info.php'">
             <div class="card-inner">
-                <div class="card-title art-label">WIKI</div>
+                <div class="card-title art-label">INFO</div>
             </div>
         </div>
 
