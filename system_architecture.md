@@ -12,10 +12,10 @@ flowchart TD
     C --> D
     D --> E[Home Dashboard]
 
-    E --> F[Play Protocol (Quiz)]
+    E --> F["Play Protocol (Quiz)"]
     E --> G[Shop]
     E --> H[Collection]
-    E --> I[Wiki / Profile]
+    E --> I["Wiki / Profile"]
 
     F --> J{Answer Question}
     J -- Correct --> K[Earn Chips]
