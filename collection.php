@@ -20,9 +20,7 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id]);
 $my_cards = $stmt->fetchAll();
-?>
-$stmt->execute([$user_id]);
-$my_cards = $stmt->fetchAll();
+
 
 $page_title = 'COLLECTION';
 include 'includes/header.php';

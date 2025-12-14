@@ -19,9 +19,7 @@ $stmt = $pdo->prepare("SELECT COUNT(*) FROM user_inventory WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $card_count = $stmt->fetchColumn();
 
-?>
-$stmt->execute([$user_id]);
-$card_count = $stmt->fetchColumn();
+
 
 $page_title = 'PROFILE';
 include 'includes/header.php';

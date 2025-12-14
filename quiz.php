@@ -28,8 +28,8 @@ $inventory_json = json_encode($inventory);
 <head>
     <meta charset="UTF-8">
     <title>BALATRO - THE BLIND</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/quiz.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="assets/css/quiz.css?v=<?php echo time(); ?>">
 </head>
 
 <body class="game-body">

@@ -25,14 +25,11 @@ if (isset($_POST['buy_card_id'])) {
     $card = $stmt->fetch();
 
     if ($card) {
-        // Check if already owned? (Optional, user didn't specify limits, but let's allow duplicates like a deck builder)
-        // Or maybe unique? Let's assume Unique for 'Collection' view simplicity, 
-        // BUT Balatro allows multiples. Let's allow multiples.
-
         if ($user_chips >= $card['price']) {
-            // Transaction
-            $pdo->beginTransaction();
+            // Transaction (Keep it simple, avoid long locks)
             try {
+                $pdo->beginTransaction();
+
                 // Deduct Chips
                 $stmt = $pdo->prepare("UPDATE users SET chips_balance = chips_balance - ? WHERE id = ?");
                 $stmt->execute([$card['price'], $user_id]);
@@ -42,15 +39,30 @@ if (isset($_POST['buy_card_id'])) {
                 $stmt->execute([$user_id, $card_id]);
 
                 $pdo->commit();
-                $message = "ACQUIRED: " . htmlspecialchars($card['name']);
+
+                // PRG: Redirect to self with success message
+                header("Location: shop.php?msg=" . urlencode("ACQUIRED: " . $card['name']));
+                exit;
+
             } catch (Exception $e) {
-                $pdo->rollBack();
-                $message = "ERROR: TRANSACTION FAILED";
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                header("Location: shop.php?error=" . urlencode("TRANSACTION FAILED"));
+                exit;
             }
         } else {
-            $message = "INSUFFICIENT FUNDS";
+            header("Location: shop.php?error=" . urlencode("INSUFFICIENT FUNDS"));
+            exit;
         }
     }
+}
+
+// Handle Messages from GET
+if (isset($_GET['msg'])) {
+    $message = htmlspecialchars($_GET['msg']);
+} elseif (isset($_GET['error'])) {
+    $message = htmlspecialchars($_GET['error']);
 }
 
 // Fetch All Cards
@@ -75,53 +87,63 @@ $show_chips = true;
 include 'includes/navbar.php';
 ?>
 
-    <!-- Message Overlay -->
-    <?php if ($message): ?>
-        <div
-            style="position:fixed; top:80px; left:50%; transform:translateX(-50%); background:black; border:2px solid var(--gold); padding:10px 20px; z-index:1000; color:var(--gold);">
-            <?php echo $message; ?>
-        </div>
-        <script>setTimeout(() => { document.querySelector('div[style*="position:fixed"]').style.display = 'none'; }, 2000);</script>
-    <?php endif; ?>
-
-    <div class="content-grid-container">
-        <?php foreach ($all_cards as $c): ?>
-            <div class="shop-card">
-                <div class="card-img-placeholder" style="background: none; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px 0;">
-                    <img src="<?php echo htmlspecialchars($c['image_url']); ?>" alt="<?php echo htmlspecialchars($c['name']); ?>" style="width: 100%; height: 100%; object-fit: contain;">
-                </div>
-                <div class="card-info">
-                    <div class="card-name"><?php echo htmlspecialchars($c['name']); ?></div>
-                    <div class="card-type" style="font-size:0.9rem; color:#444;">
-                        <?php echo htmlspecialchars($c['type']); ?>
-                        <span
-                            style="font-weight:bold; color:<?php echo $c['category'] == 'Skill' ? 'var(--blue)' : 'var(--red)'; ?>">
-                            [<?php echo htmlspecialchars($c['category']); ?>]
-                        </span>
-                    </div>
-                    <div class="card-price" style="font-size:1.4rem;">$<?php echo number_format($c['price']); ?></div>
-
-                    <form method="POST">
-                        <input type="hidden" name="buy_card_id" value="<?php echo $c['id']; ?>">
-                        
-                        <?php 
-                        $is_owned = in_array($c['id'], $owned_ids);
-                        $is_unique_type = ($c['category'] === 'Collection');
-                        
-                        if ($is_unique_type && $is_owned): ?>
-                             <button type="button" class="btn-buy" disabled style="background:#555; color:#aaa;">
-                                OWNED
-                            </button>
-                        <?php else: ?>
-                            <button type="submit" class="btn-buy" <?php echo ($current_chips < $c['price']) ? 'disabled' : ''; ?>>
-                                BUY
-                            </button>
-                        <?php endif; ?>
-                    </form>
-                </div>
-            </div>
-        <?php endforeach; ?>
+<!-- Message Overlay -->
+<?php if ($message): ?>
+    <div id="shop-notification" class="custom-notification show">
+        <?php echo $message; ?>
     </div>
+    <script>
+        setTimeout(() => { 
+            const note = document.getElementById('shop-notification');
+            if(note) {
+                note.classList.remove('show');
+                setTimeout(() => note.remove(), 300);
+            }
+        }, 2500);
+    </script>
+<?php endif; ?>
+
+<div class="content-grid-container">
+    <?php foreach ($all_cards as $c): ?>
+        <div class="shop-card">
+            <div class="card-img-placeholder"
+                style="background: none; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px 0;">
+                <img src="<?php echo htmlspecialchars($c['image_url']); ?>"
+                    alt="<?php echo htmlspecialchars($c['name']); ?>"
+                    style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+            <div class="card-info">
+                <div class="card-name"><?php echo htmlspecialchars($c['name']); ?></div>
+                <div class="card-type" style="font-size:0.9rem; color:#444;">
+                    <?php echo htmlspecialchars($c['type']); ?>
+                    <span
+                        style="font-weight:bold; color:<?php echo $c['category'] == 'Skill' ? 'var(--blue)' : 'var(--red)'; ?>">
+                        [<?php echo htmlspecialchars($c['category']); ?>]
+                    </span>
+                </div>
+                <div class="card-price" style="font-size:1.4rem;">$<?php echo number_format($c['price']); ?></div>
+
+                <form method="POST">
+                    <input type="hidden" name="buy_card_id" value="<?php echo $c['id']; ?>">
+
+                    <?php
+                    $is_owned = in_array($c['id'], $owned_ids);
+                    $is_unique_type = ($c['category'] === 'Collection');
+
+                    if ($is_unique_type && $is_owned): ?>
+                        <button type="button" class="btn-buy" disabled style="background:#555; color:#aaa;">
+                            OWNED
+                        </button>
+                    <?php else: ?>
+                        <button type="submit" class="btn-buy" <?php echo ($current_chips < $c['price']) ? 'disabled' : ''; ?>>
+                            BUY
+                        </button>
+                    <?php endif; ?>
+                </form>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>
 
 
 

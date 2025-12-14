@@ -42,7 +42,7 @@ async function startGame() {
 
     } catch (e) {
         console.error(e);
-        alert("Failed to load deck: " + e.message);
+        showNotification("Failed to load deck: " + e.message);
         // window.location.href = 'home.php'; // DISABLED FOR DEBUGGING
     }
 }
@@ -53,15 +53,16 @@ function resetGameState() {
     currentMult = 1.0;
     timeLeft = 30;
     isPaused = false;
-    chicotActive = checkJokerEffect('protect_streak'); 
+    isPaused = false;
+    // chicotActive = false; // Reset per round? Or keep if active? 
+    // User requested "Active Skill". So it resets unless clicked.
+    // If it's a shield, maybe it persists until hit? 
+    // Let's assume it persists until hit or Game Over.
     renderInventory();
     updateHUD();
 }
 
-function checkJokerEffect(effect) {
-    if (!window.userInventory) return false;
-    return window.userInventory.some(c => c.type === 'Joker' && c.effect_logic === effect);
-}
+// checkJokerEffect removed (Jokers are now Active Skills)
 
 function renderInventory() {
     // const jokerContainer = document.getElementById('joker-slots'); // Removed
@@ -102,15 +103,9 @@ function renderInventory() {
 
         // Render ALL cards in the Consumable container (User request: "hapus box card joker", "chicot join consumable")
         
-        // Logic: Chicot is passive, others are active.
-        if (card.type === 'Tarot' || card.effect_logic === 'retrigger_last') {
-            div.onclick = () => usePowerup(card.effect_logic);
-            div.style.cursor = 'pointer';
-        } else {
-             // Passive (Chicot)
-             div.style.cursor = 'default';
-             div.title += " (Passive Effect Active)";
-        }
+        // Render ALL cards in the Consumable container (User request: "Active Skill" for all)
+        div.onclick = () => usePowerup(card.effect_logic);
+        div.style.cursor = 'pointer';
         
         consumableContainer.appendChild(div);
     });
@@ -197,7 +192,8 @@ function handleAnswer(selectedKey, btnElement) {
             currentMult = 1.0; // Reset Streak
         } else {
             // Chicot prevents reset
-            // Maybe visual cue?
+            showNotification("CHICOT PROTECTED YOUR MULT!", 2000);
+            chicotActive = false; // Consumed the shield
         }
         document.body.classList.add('shake');
         setTimeout(() => document.body.classList.remove('shake'), 500);
@@ -226,7 +222,7 @@ async function usePowerup(effect) {
     // Handle Blueprint (copy last effect)
     if (effect === 'retrigger_last') {
         if (!lastUsedEffect) {
-            alert("BLUEPRINT: No Tarot used yet!");
+            showNotification("BLUEPRINT: No Tarot used yet!");
             return;
         }
         // Use the last effect, but don't consume Blueprint (Wait, user says "Card skill that has been purchased... disappears"). 
@@ -265,7 +261,7 @@ async function usePowerup(effect) {
         const data = await res.json();
         
         if (data.error) {
-            alert("Failed to use card: " + data.error);
+            showNotification("Failed to use card: " + data.error);
             return;
         }
 
@@ -283,11 +279,11 @@ async function usePowerup(effect) {
         let logicEffect = effect;
         if (effect === 'retrigger_last') {
             if (!lastUsedEffect) {
-                 alert("Blueprint wasted! No previous Tarot used.");
+                 showNotification("Blueprint wasted! No previous Tarot used.");
                  return;
             }
             logicEffect = lastUsedEffect;
-            alert(`BLUEPRINT copies ${logicEffect.toUpperCase()}!`);
+            showNotification(`BLUEPRINT copies ${logicEffect.toUpperCase()}!`);
         } else {
             // Update last used (only if not Blueprint itself, to prevent Blueprint copying Blueprint?)
             // Balatro: Blueprint copies the Joker to the right. 
@@ -307,7 +303,7 @@ async function usePowerup(effect) {
                 els.timerBar.style.backgroundColor = 'var(--red)';
             }, 10000); 
             // Alert handled above or generic
-            if (effect !== 'retrigger_last') alert("THE WORLD: Time Frozen for 10s!");
+            if (effect !== 'retrigger_last') showNotification("THE WORLD: Time Frozen for 10s!", 4000);
         }
         else if (logicEffect === 'hide_wrong') { // Hanged Man
             const wrongKeys = ['A','B','C','D'].filter(k => k !== q.correct_option);
@@ -327,6 +323,10 @@ async function usePowerup(effect) {
         else if (logicEffect === 'double_mult') { // Hierophant
             currentMult *= 2;
             updateHUD();
+        }
+        else if (logicEffect === 'protect_streak') { // Chicot
+            chicotActive = true;
+            showNotification("CHICOT SHIELD ACTIVATED! Next error ignored.", 4000);
         }
 
     } catch (e) {
@@ -354,4 +354,28 @@ async function endGame(completed) {
     els.overlayTitle.textContent = completed ? "BLIND DEFEATED" : "GAME OVER";
     els.overlayScore.textContent = "FINAL SCORE: " + Math.floor(score);
     els.overlay.style.display = 'flex';
+}
+
+function showNotification(message, duration = 3000) {
+    let note = document.getElementById('custom-notification');
+    if (!note) {
+        note = document.createElement('div');
+        note.id = 'custom-notification';
+        note.className = 'custom-notification';
+        document.body.appendChild(note);
+    }
+    
+    note.textContent = message;
+    
+    // Reset animation
+    note.classList.remove('show');
+    void note.offsetWidth; // Trigger reflow
+    note.classList.add('show');
+    
+    // Clear existing timeout
+    if (note.timeout) clearTimeout(note.timeout);
+    
+    note.timeout = setTimeout(() => {
+        note.classList.remove('show');
+    }, duration);
 }
